@@ -339,6 +339,11 @@ function displayTravelPlan(plan) {
   planResult.innerHTML = html;
   resultSection.style.display = "block";
 
+  // 通知工具栏计划已更新
+  window.dispatchEvent(new CustomEvent('planUpdated', { 
+    detail: plan 
+  }));
+
   // 延迟调用地图显示，避免影响主流程（添加错误处理）
   setTimeout(async () => {
     try {

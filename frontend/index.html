@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI旅行规划师</title>
-    <link rel="stylesheet" href="css/style.css?v=31" />
+    <link rel="stylesheet" href="css/style.css?v=32" />
     <!-- 高德地图API -->
     <!-- 临时禁用安全密钥以测试路线规划 -->
     <!--
@@ -390,6 +390,97 @@
       </section>
     </div>
 
+    <!-- 侧边功能栏 -->
+    <div class="floating-toolbar" id="floatingToolbar">
+      <button class="toolbar-btn" id="exportPdfBtn" title="导出为PDF">
+        <span class="toolbar-icon">📄</span>
+        <span class="toolbar-text">导出</span>
+      </button>
+      <button class="toolbar-btn" id="copyPlanBtn" title="复制行程">
+        <span class="toolbar-icon">📋</span>
+        <span class="toolbar-text">复制</span>
+      </button>
+      <button class="toolbar-btn" id="printPlanBtn" title="打印行程">
+        <span class="toolbar-icon">🖨️</span>
+        <span class="toolbar-text">打印</span>
+      </button>
+      <button class="toolbar-btn" id="sharePlanBtn" title="分享行程">
+        <span class="toolbar-icon">🔗</span>
+        <span class="toolbar-text">分享</span>
+      </button>
+      <div class="toolbar-divider"></div>
+      <button class="toolbar-btn" id="backToTopBtn" title="返回顶部">
+        <span class="toolbar-icon">⬆️</span>
+        <span class="toolbar-text">顶部</span>
+      </button>
+      <button class="toolbar-btn" id="helpBtn" title="帮助中心">
+        <span class="toolbar-icon">❓</span>
+        <span class="toolbar-text">帮助</span>
+      </button>
+    </div>
+
+    <!-- 分享弹窗 -->
+    <div class="modal" id="shareModal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>🔗 分享旅行计划</h3>
+          <button class="modal-close" id="closeShareModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p style="color: var(--text-secondary); margin-bottom: 1rem;">复制下方链接分享给朋友：</p>
+          <div class="share-link-container">
+            <input type="text" id="shareLink" class="share-link-input" readonly />
+            <button class="btn btn-primary" id="copyShareLink">复制链接</button>
+          </div>
+          <div class="share-tips">
+            <p>💡 提示：您也可以通过以下方式分享：</p>
+            <div class="share-options">
+              <button class="share-option-btn" id="shareViaEmail">📧 邮件</button>
+              <button class="share-option-btn" id="shareViaQR">📱 二维码</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 帮助弹窗 -->
+    <div class="modal" id="helpModal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>❓ 使用帮助</h3>
+          <button class="modal-close" id="closeHelpModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="help-section">
+            <h4>🎤 语音输入</h4>
+            <p>点击麦克风按钮，说出您的旅行需求，AI会自动识别并填充表单。</p>
+            <p class="help-example"><strong>示例：</strong>"我想今年12月去东京，5天，预算1万元，2人，喜欢美食和动漫"</p>
+          </div>
+          <div class="help-section">
+            <h4>📝 手动输入</h4>
+            <p>填写目的地、天数、预算等信息，点击"生成旅行计划"按钮即可。</p>
+          </div>
+          <div class="help-section">
+            <h4>🗺️ 查看地图</h4>
+            <p>生成计划后，地图会自动显示景点、餐厅和住宿位置，以及推荐路线。</p>
+          </div>
+          <div class="help-section">
+            <h4>💰 预算管理</h4>
+            <p>在"预算管理"页面，您可以记录实际花费，AI会帮您分析预算使用情况。</p>
+          </div>
+          <div class="help-section">
+            <h4>📄 功能按钮</h4>
+            <ul class="help-list">
+              <li><strong>导出：</strong>将行程导出为PDF文件</li>
+              <li><strong>复制：</strong>快速复制行程文本</li>
+              <li><strong>打印：</strong>打印行程单</li>
+              <li><strong>分享：</strong>生成分享链接</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 加载中提示 -->
     <div id="loading" class="loading" style="display: none">
       <div class="spinner"></div>
@@ -437,10 +528,11 @@
       })();
     </script>
 
-    <script src="js/app.js?v=26"></script>
+    <script src="js/app.js?v=27"></script>
     <script src="js/auth.js?v=14"></script>
     <script src="js/voice.js?v=13"></script>
     <script src="js/map.js?v=42"></script>
     <script src="js/budget.js?v=13"></script>
+    <script src="js/toolbar.js?v=1"></script>
   </body>
 </html>
