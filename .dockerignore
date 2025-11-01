@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# 文档（保留DOCKER_README.md）
+README.md
+Windows使用指南.md
+使用说明.md
+API_DOCUMENTATION.md
+CHANGELOG.md
+CONTRIBUTING.md
+DEPLOYMENT.md
+FAQ.md
+PROJECT_SUMMARY.md
+QUICK_START.md
+SETUP_GUIDE.md
+
+# 测试
+tests/
+*.log
+
+# 环境变量（安全起见）
+.env
+.env.*
+
+# 截图
+界面功能截图/
+
+# 脚本
+scripts/
+
+# 其他
+.DS_Store
+*.sql
+check_versions.py
+test_*.py

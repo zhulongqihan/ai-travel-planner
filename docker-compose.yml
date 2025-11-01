@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  ai-travel-planner:
+    image: crpi-6mppr7h5m3b03dk6.cn-hangzhou.personal.cr.aliyuncs.com/aitravel/ai-travel-planner:latest
+    container_name: ai-travel-planner
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Supabase 配置
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      
+      # 阿里云百炼配置
+      - DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY}
+      
+      # 阿里云语音识别配置（可选）
+      - ALIYUN_SPEECH_APP_KEY=${ALIYUN_SPEECH_APP_KEY:-}
+      - ALIYUN_ACCESS_KEY_ID=${ALIYUN_ACCESS_KEY_ID:-}
+      - ALIYUN_ACCESS_KEY_SECRET=${ALIYUN_ACCESS_KEY_SECRET:-}
+      
+      # 高德地图配置
+      - AMAP_API_KEY=${AMAP_API_KEY}
+      - AMAP_WEB_KEY=${AMAP_WEB_KEY}
+    networks:
+      - ai-travel-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  ai-travel-network:
+    driver: bridge
