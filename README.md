@@ -1,5 +1,15 @@
 # 🌍 AI 旅行规划师 (AI Travel Planner)
 
+## 项目地址：https://github.com/zhulongqihan/ai-travel-planner
+
+github中包含有相关运行截图
+
+测试账号：admin@nju.edu.cn
+
+测试密码：123456
+
+> 
+>
 > 一个功能完善、界面现代的 AI 智能旅行规划 Web 应用，基于阿里云百炼大模型，提供智能行程生成、地图导航、语音识别、预算管理等功能。
 
 ![Version](https://img.shields.io/badge/version-2.0-blue.svg)
@@ -39,17 +49,52 @@ docker run -d \
 # 浏览器打开 http://localhost:8000
 ```
 
-### 🔑 测试账号信息（供评审使用）
+### 🔑 配置说明（供评审使用）
 
-项目已内置测试配置，您只需提供**阿里云百炼 API Key**：
+#### 📌 助教请注意
 
-| 服务 | 配置项 | 说明 |
-|------|--------|------|
-| **阿里云百炼** | `DASHSCOPE_API_KEY` | **请使用您自己的 Key**<br/>获取地址：https://dashscope.aliyun.com/ |
-| Supabase | `SUPABASE_URL`<br/>`SUPABASE_KEY` | 已提供测试账号<br/>有效期至 2025-04-01 |
-| 高德地图 | `AMAP_API_KEY`<br/>`AMAP_WEB_KEY` | 已提供测试密钥<br/>有效期至 2025-04-01 |
+本项目需要以下 API 配置才能正常运行：
 
-**注意**：Supabase 和高德地图的测试配置已在 `env.docker.example` 文件中预置。
+| 配置项 | 获取方式 | 说明 |
+|--------|---------|------|
+| `DASHSCOPE_API_KEY` | **请使用您自己的 Key**<br/>https://dashscope.aliyun.com/ | 阿里云百炼大模型 API |
+| `SUPABASE_URL`<br/>`SUPABASE_KEY` | **作业提交平台提供** | 数据库和认证服务 |
+| `AMAP_API_KEY`<br/>`AMAP_WEB_KEY` | **作业提交平台提供** | 高德地图服务 |
+| `ALIYUN_SPEECH_*` | **作业提交平台提供**<br/>（可选） | 语音识别功能 |
+
+#### 🎯 快速配置流程
+
+1. **克隆项目**
+   ```bash
+   git clone https://github.com/zhulongqihan/ai-travel-planner.git
+   cd ai-travel-planner
+   ```
+
+2. **复制配置模板**
+   ```bash
+   # Windows
+   copy env.docker.example .env.docker
+   
+   # Linux/Mac
+   cp env.docker.example .env.docker
+   ```
+
+3. **编辑 `.env.docker`**
+   - 从作业提交平台获取完整的 API Keys
+   - 填入您自己的 `DASHSCOPE_API_KEY`
+
+4. **一键启动**
+   ```bash
+   docker-compose up -d
+   ```
+
+5. **访问应用**
+   - 浏览器打开：http://localhost:8000
+   - 测试账号：`admin@nju.edu.cn` / `123456`
+
+> 📚 **详细配置指南**：请查看 [助教配置指南.md](助教配置指南.md)
+
+
 
 ### 📚 详细文档
 
