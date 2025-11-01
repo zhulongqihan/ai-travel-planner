@@ -420,23 +420,34 @@
     </div>
 
     <!-- 分享弹窗 -->
-    <div class="modal" id="shareModal" style="display: none;">
+    <div class="modal" id="shareModal" style="display: none">
       <div class="modal-content">
         <div class="modal-header">
           <h3>🔗 分享旅行计划</h3>
           <button class="modal-close" id="closeShareModal">&times;</button>
         </div>
         <div class="modal-body">
-          <p style="color: var(--text-secondary); margin-bottom: 1rem;">复制下方链接分享给朋友：</p>
+          <p style="color: var(--text-secondary); margin-bottom: 1rem">
+            复制下方链接分享给朋友：
+          </p>
           <div class="share-link-container">
-            <input type="text" id="shareLink" class="share-link-input" readonly />
+            <input
+              type="text"
+              id="shareLink"
+              class="share-link-input"
+              readonly
+            />
             <button class="btn btn-primary" id="copyShareLink">复制链接</button>
           </div>
           <div class="share-tips">
             <p>💡 提示：您也可以通过以下方式分享：</p>
             <div class="share-options">
-              <button class="share-option-btn" id="shareViaEmail">📧 邮件</button>
-              <button class="share-option-btn" id="shareViaQR">📱 二维码</button>
+              <button class="share-option-btn" id="shareViaEmail">
+                📧 邮件
+              </button>
+              <button class="share-option-btn" id="shareViaQR">
+                📱 二维码
+              </button>
             </div>
           </div>
         </div>
@@ -444,7 +455,7 @@
     </div>
 
     <!-- 帮助弹窗 -->
-    <div class="modal" id="helpModal" style="display: none;">
+    <div class="modal" id="helpModal" style="display: none">
       <div class="modal-content">
         <div class="modal-header">
           <h3>❓ 使用帮助</h3>
@@ -454,7 +465,10 @@
           <div class="help-section">
             <h4>🎤 语音输入</h4>
             <p>点击麦克风按钮，说出您的旅行需求，AI会自动识别并填充表单。</p>
-            <p class="help-example"><strong>示例：</strong>"我想今年12月去东京，5天，预算1万元，2人，喜欢美食和动漫"</p>
+            <p class="help-example">
+              <strong>示例：</strong
+              >"我想今年12月去东京，5天，预算1万元，2人，喜欢美食和动漫"
+            </p>
           </div>
           <div class="help-section">
             <h4>📝 手动输入</h4>
@@ -462,11 +476,15 @@
           </div>
           <div class="help-section">
             <h4>🗺️ 查看地图</h4>
-            <p>生成计划后，地图会自动显示景点、餐厅和住宿位置，以及推荐路线。</p>
+            <p>
+              生成计划后，地图会自动显示景点、餐厅和住宿位置，以及推荐路线。
+            </p>
           </div>
           <div class="help-section">
             <h4>💰 预算管理</h4>
-            <p>在"预算管理"页面，您可以记录实际花费，AI会帮您分析预算使用情况。</p>
+            <p>
+              在"预算管理"页面，您可以记录实际花费，AI会帮您分析预算使用情况。
+            </p>
           </div>
           <div class="help-section">
             <h4>📄 功能按钮</h4>
