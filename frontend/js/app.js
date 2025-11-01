@@ -166,10 +166,77 @@ function displayTravelPlan(plan) {
   const estimatedCost =
     plan.estimated_cost || plan.itinerary?.cost_breakdown?.total || "待计算";
 
+  // 计算总天数和总景点数
+  let totalActivities = 0;
+  let totalRestaurants = 0;
+  if (plan.itinerary && plan.itinerary.days) {
+    plan.itinerary.days.forEach((day) => {
+      if (day.activities) totalActivities += day.activities.length;
+      if (day.meals) totalRestaurants += day.meals.length;
+    });
+  }
+
+  // 提取旅行偏好作为特色标签
+  const preferences = plan.preferences || "";
+  const featureTags = preferences.split(/[,，、]/).filter(tag => tag.trim()).slice(0, 5);
+
+  // 生成整体计划概览卡片
   let html = `
-        <div class="plan-overview">
-            <h4>${plan.destination} ${plan.days}日游</h4>
-            <p>预算：¥${plan.budget} | 预估费用：¥${estimatedCost}</p>
+        <!-- 整体计划概览 -->
+        <div class="plan-summary-card">
+            <div class="plan-summary-header">
+                <div class="plan-summary-title">
+                    <h2>✈️ ${plan.destination}精彩之旅</h2>
+                    <p>${plan.days}天${plan.days - 1}晚 · ${plan.travelers}人同行</p>
+                </div>
+                <div class="plan-summary-badge">
+                    ${plan.start_date || '待定日期'}
+                </div>
+            </div>
+            
+            <div class="plan-summary-stats">
+                <div class="stat-item">
+                    <span class="stat-icon">📅</span>
+                    <div class="stat-label">行程天数</div>
+                    <div class="stat-value">${plan.days}天</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">💰</span>
+                    <div class="stat-label">预算总额</div>
+                    <div class="stat-value">¥${plan.budget.toLocaleString()}</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">💳</span>
+                    <div class="stat-label">预估费用</div>
+                    <div class="stat-value">¥${typeof estimatedCost === 'number' ? estimatedCost.toLocaleString() : estimatedCost}</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🎯</span>
+                    <div class="stat-label">精选景点</div>
+                    <div class="stat-value">${totalActivities}个</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🍽️</span>
+                    <div class="stat-label">美食推荐</div>
+                    <div class="stat-value">${totalRestaurants}家</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">👥</span>
+                    <div class="stat-label">同行人数</div>
+                    <div class="stat-value">${plan.travelers}人</div>
+                </div>
+            </div>
+            
+            ${featureTags.length > 0 ? `
+            <div class="plan-summary-features">
+                ${featureTags.map(tag => `<span class="feature-tag">🏷️ ${tag.trim()}</span>`).join('')}
+            </div>
+            ` : ''}
+        </div>
+
+        <!-- 详细行程分割线 -->
+        <div style="text-align: center; margin: 2rem 0; color: var(--text-secondary); font-size: 1.1rem; font-weight: 600;">
+            📋 详细行程安排
         </div>
     `;
 
