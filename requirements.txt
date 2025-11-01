@@ -1,0 +1,35 @@
+# AI Travel Planner - 实际可工作的版本
+
+# FastAPI框架
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+
+# 数据库和认证
+supabase>=2.10.0
+
+# AI模型调用
+openai==1.54.0
+
+# HTTP客户端（关键：版本约束）
+httpx>=0.24.0,<0.28.0
+
+# WebSocket支持（关键：必需）
+websockets>=13.0
+
+# 环境变量管理
+python-dotenv>=1.0.0
+
+# 文件上传处理
+python-multipart>=0.0.6
+
+# 邮箱验证
+email-validator>=2.1.0
+
+# 日期时间处理
+python-dateutil>=2.8.0
+
+# JSON日志
+python-json-logger>=2.0.0
+
+# HTTP请求
+requests>=2.31.0

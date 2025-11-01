@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI旅行规划师</title>
+    <link rel="stylesheet" href="css/style.css?v=30" />
+    <!-- 高德地图API -->
+    <!-- 临时禁用安全密钥以测试路线规划 -->
+    <!--
+    <script type="text/javascript">
+      window._AMapSecurityConfig = {
+        securityJsCode: "3a94f338ed9ed30f6e0634e90c3399f1",
+      };
+    </script>
+    -->
+    <script src="https://webapi.amap.com/maps?v=2.0&key=c8f16d2838c16c8823f95affdea6d5be"></script>
+    <script src="https://webapi.amap.com/loca?v=2.0.0&key=c8f16d2838c16c8823f95affdea6d5be"></script>
+  </head>
+  <body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo">
+          <h1>🌍 AI旅行规划师</h1>
+        </div>
+        <div class="nav-menu" id="navMenu">
+          <a href="#home" class="nav-link active">首页</a>
+          <a href="#plans" class="nav-link">我的计划</a>
+          <a href="#budget" class="nav-link">预算管理</a>
+          <div class="user-info" id="userInfo">
+            <span id="userEmail"></span>
+            <button class="btn btn-secondary" id="logoutBtn">退出</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+      <!-- 首页 - 创建旅行计划 -->
+      <section id="home" class="section active">
+        <div class="hero">
+          <h2>让AI帮你规划完美旅行</h2>
+          <p>只需告诉我你的想法，剩下的交给我</p>
+        </div>
+
+        <!-- 主内容区域：左侧表单 + 右侧地图 -->
+        <div class="main-content-with-map">
+          <!-- 左侧：输入区域 -->
+          <div class="planning-container">
+            <div class="input-section">
+              <h3>创建旅行计划</h3>
+
+              <!-- 语音输入 -->
+              <div class="voice-input">
+                <button class="btn-voice" id="voiceBtn">
+                  🎤 点击开始语音输入
+                </button>
+                <p
+                  class="voice-hint"
+                  style="margin-top: 10px; font-size: 13px; color: #666"
+                >
+                  💡 <strong>建议格式：</strong>我想<strong
+                    style="color: #1976d2"
+                    >[日期]</strong
+                  >去<strong style="color: #1976d2">[目的地]</strong>，<strong
+                    style="color: #1976d2"
+                    >[天数]</strong
+                  >天，预算<strong style="color: #1976d2">[金额]</strong
+                  >元，<strong style="color: #1976d2">[人数]</strong
+                  >人，喜欢<strong style="color: #1976d2">[偏好]</strong>
+                </p>
+                <p
+                  class="voice-hint"
+                  style="margin-top: 5px; font-size: 13px; color: #4caf50"
+                >
+                  ✅
+                  <strong>完整示例：</strong
+                  >"我想<strong>2025年12月25号</strong>去<strong>南京</strong>，<strong>5</strong>天，预算<strong>1万</strong>元，<strong>2</strong>人，喜欢<strong>美食和动漫</strong>"
+                </p>
+                <p
+                  class="voice-hint"
+                  style="margin-top: 5px; font-size: 13px; color: #ff9800"
+                >
+                  🌟 <strong>日期请明确表达年月日</strong> |
+                  <strong>AI会自动理解中文表达</strong>
+                </p>
+              </div>
+
+              <div class="divider">或手动输入</div>
+
+              <!-- 手动输入表单 -->
+              <form id="travelForm" class="travel-form">
+                <div class="form-group">
+                  <label for="destination">目的地</label>
+                  <input
+                    type="text"
+                    id="destination"
+                    placeholder="例如：日本东京"
+                    required
+                  />
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="days">旅行天数</label>
+                    <input
+                      type="number"
+                      id="days"
+                      min="1"
+                      placeholder="5"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="planBudget">预算（元）</label>
+                    <input
+                      type="number"
+                      id="planBudget"
+                      min="0"
+                      placeholder="10000"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="travelers">同行人数</label>
+                    <input
+                      type="number"
+                      id="travelers"
+                      min="1"
+                      placeholder="2"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="start_date">出发日期</label>
+                    <input type="date" id="start_date" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="preferences">旅行偏好</label>
+                  <textarea
+                    id="preferences"
+                    rows="3"
+                    placeholder="例如：喜欢美食、动漫文化、带孩子、需要舒适的住宿"
+                  ></textarea>
+                </div>
+
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-large"
+                  id="generateBtn"
+                >
+                  生成旅行计划
+                </button>
+
+                <!-- 进度条 -->
+                <div
+                  id="progressContainer"
+                  class="progress-container"
+                  style="display: none"
+                >
+                  <div class="progress-bar-wrapper">
+                    <div class="progress-bar" id="progressBar"></div>
+                  </div>
+                  <p class="progress-message" id="progressMessage">准备中...</p>
+                </div>
+              </form>
+            </div>
+
+            <!-- 结果展示区域 -->
+            <div
+              class="result-section"
+              id="resultSection"
+              style="display: none"
+            >
+              <div class="result-header">
+                <h3>您的旅行计划</h3>
+                <button class="btn btn-secondary" id="saveBtn">保存计划</button>
+              </div>
+
+              <div id="planResult"></div>
+
+              <!-- 路线信息展示区域 -->
+              <div
+                id="routeInfoSection"
+                class="route-info-section"
+                style="display: none"
+              >
+                <h3>📍 旅行路线详情</h3>
+                <div id="routeInfoList" class="route-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右侧：地图区域 -->
+          <div class="main-map-container">
+            <div class="map-info">
+              <h3 id="mainMapTitle">旅行地图</h3>
+              <p id="mainMapSubtitle">
+                （暂不支持国外路线显示）输入目的地，查看位置
+              </p>
+            </div>
+            <div id="mainMap" class="main-map"></div>
+            <div class="map-legend">
+              <div class="legend-item">
+                <span class="legend-icon">🎯</span>
+                <span>景点</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-icon">🍽️</span>
+                <span>餐厅</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-icon">🏨</span>
+                <span>住宿</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-line" style="background: #2563eb"></span>
+                <span>景点路线</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-line" style="background: #f59e0b"></span>
+                <span>餐厅路线</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-line" style="background: #8b5cf6"></span>
+                <span>酒店路线</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 我的计划 -->
+      <section id="plans" class="section">
+        <h2>我的旅行计划</h2>
+        <div id="plansList" class="plans-list">
+          <!-- 动态加载计划列表 -->
+        </div>
+      </section>
+
+      <!-- 预算管理 -->
+      <section
+        id="budget"
+        class="section"
+        style="padding: 2rem; min-height: 400px"
+      >
+        <h2>💰 预算管理</h2>
+
+        <!-- 计划选择器 -->
+        <div class="budget-plan-selector">
+          <label for="budgetPlanSelect">选择旅行计划：</label>
+          <select id="budgetPlanSelect" class="form-control">
+            <option value="">-- 请选择一个旅行计划 --</option>
+          </select>
+        </div>
+
+        <div id="budgetContent" style="display: none">
+          <!-- 预算总览 -->
+          <div class="budget-overview">
+            <div class="budget-card total">
+              <div class="budget-icon">💵</div>
+              <div class="budget-info">
+                <div class="budget-label">总预算</div>
+                <div class="budget-value" id="totalBudget">¥0</div>
+              </div>
+            </div>
+            <div class="budget-card spent">
+              <div class="budget-icon">💸</div>
+              <div class="budget-info">
+                <div class="budget-label">已花费</div>
+                <div class="budget-value" id="totalSpent">¥0</div>
+              </div>
+            </div>
+            <div class="budget-card remaining">
+              <div class="budget-icon">💰</div>
+              <div class="budget-info">
+                <div class="budget-label">剩余预算</div>
+                <div class="budget-value" id="remainingBudget">¥0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 预算进度条 -->
+          <div class="budget-progress-container">
+            <div class="budget-progress-bar">
+              <div class="budget-progress-fill" id="budgetProgressFill"></div>
+            </div>
+            <div class="budget-progress-text" id="budgetProgressText">0%</div>
+          </div>
+
+          <!-- 添加费用 -->
+          <div class="expense-form-container">
+            <h3>📝 添加费用记录</h3>
+
+            <!-- 语音输入费用 -->
+            <div class="voice-input-expense">
+              <button class="btn-voice" id="voiceBtnExpense">
+                🎤 语音添加费用
+              </button>
+              <p
+                class="voice-hint"
+                style="margin-top: 10px; font-size: 13px; color: #666"
+              >
+                💡 说出费用信息，例如："吃饭花了200元"、"住宿1000块"、"门票500"
+              </p>
+            </div>
+
+            <div class="divider-small">或手动输入</div>
+
+            <form id="expenseForm" class="expense-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="expenseCategory">费用类别</label>
+                  <select id="expenseCategory" required>
+                    <option value="">请选择</option>
+                    <option value="交通">🚗 交通</option>
+                    <option value="住宿">🏨 住宿</option>
+                    <option value="餐饮">🍽️ 餐饮</option>
+                    <option value="门票">🎫 门票</option>
+                    <option value="购物">🛍️ 购物</option>
+                    <option value="其他">📦 其他</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="expenseAmount">金额（元）</label>
+                  <input
+                    type="number"
+                    id="expenseAmount"
+                    min="0"
+                    step="0.01"
+                    placeholder="100"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="expenseDescription">费用说明</label>
+                <input
+                  type="text"
+                  id="expenseDescription"
+                  placeholder="例如：午餐、出租车费"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="expenseDate">日期</label>
+                <input type="date" id="expenseDate" />
+              </div>
+              <button type="submit" class="btn btn-primary">➕ 添加费用</button>
+            </form>
+          </div>
+
+          <!-- 费用列表 -->
+          <div class="expenses-list-container">
+            <h3>📋 费用记录</h3>
+            <div id="expensesList" class="expenses-list">
+              <p class="hint">暂无费用记录</p>
+            </div>
+          </div>
+
+          <!-- 分类统计 -->
+          <div class="category-breakdown">
+            <h3>📊 分类统计</h3>
+            <div id="categoryChart" class="category-chart"></div>
+          </div>
+
+          <!-- AI预算建议 -->
+          <div class="budget-recommendations">
+            <h3>🤖 AI预算建议</h3>
+            <button class="btn btn-secondary" id="analyzeBtn">
+              🔍 获取AI分析
+            </button>
+            <div id="recommendationsList" class="recommendations-list"></div>
+          </div>
+        </div>
+
+        <div id="budgetEmptyState" class="empty-state">
+          <div class="empty-icon">📊</div>
+          <p>请先选择一个旅行计划开始管理预算</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- 加载中提示 -->
+    <div id="loading" class="loading" style="display: none">
+      <div class="spinner"></div>
+      <p>AI正在为您规划旅行...</p>
+    </div>
+
+    <!-- 深色模式切换按钮 -->
+    <button id="themeToggle" class="theme-toggle" aria-label="切换主题">
+      <span id="themeIcon">🌙</span>
+    </button>
+
+    <!-- 主题切换脚本 -->
+    <script>
+      // 主题切换功能
+      (function () {
+        const themeToggle = document.getElementById("themeToggle");
+        const themeIcon = document.getElementById("themeIcon");
+        const html = document.documentElement;
+
+        // 从localStorage加载主题
+        const savedTheme = localStorage.getItem("theme") || "light";
+        html.setAttribute("data-theme", savedTheme);
+        updateThemeIcon(savedTheme);
+
+        // 切换主题
+        themeToggle.addEventListener("click", () => {
+          const currentTheme = html.getAttribute("data-theme");
+          const newTheme = currentTheme === "light" ? "dark" : "light";
+
+          html.setAttribute("data-theme", newTheme);
+          localStorage.setItem("theme", newTheme);
+          updateThemeIcon(newTheme);
+
+          // 添加切换动画
+          themeToggle.style.transform = "rotate(360deg) scale(1.2)";
+          setTimeout(() => {
+            themeToggle.style.transform = "";
+          }, 300);
+        });
+
+        // 更新图标
+        function updateThemeIcon(theme) {
+          themeIcon.textContent = theme === "light" ? "🌙" : "☀️";
+        }
+      })();
+    </script>
+
+    <script src="js/app.js?v=25"></script>
+    <script src="js/auth.js?v=14"></script>
+    <script src="js/voice.js?v=13"></script>
+    <script src="js/map.js?v=42"></script>
+    <script src="js/budget.js?v=13"></script>
+  </body>
+</html>
