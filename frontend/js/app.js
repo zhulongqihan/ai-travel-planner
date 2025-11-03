@@ -385,6 +385,293 @@ async function loadUserPlans() {
   }
 }
 
+// 生成计划封面（使用渐变背景，不依赖外部图片）
+function generatePlanCoverImage(destination) {
+  // 返回 null，让CSS处理渐变背景
+  return null;
+}
+
+/**
+ * 为目的地生成独特的渐变色背景
+ * @param {string} destination - 目的地名称
+ * @returns {string} CSS渐变背景
+ */
+function getDestinationGradient(destination) {
+  // 精美的渐变色方案库
+  const gradients = [
+    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // 紫色梦幻
+    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', // 粉红浪漫
+    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // 蓝色清新
+    'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', // 绿色生机
+    'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', // 橙粉活力
+    'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', // 蓝紫神秘
+    'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', // 清新糖果
+    'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', // 温柔粉色
+    'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', // 暖阳橙色
+    'linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%)', // 粉蓝渐变
+    'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)', // 紫蓝渐变
+    'linear-gradient(135deg, #f77062 0%, #fe5196 100%)', // 热情红色
+    'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)', // 金紫渐变
+    'linear-gradient(135deg, #e94057 0%, #f27121 100%)', // 火焰橙红
+    'linear-gradient(135deg, #0ba360 0%, #3cba92 100%)', // 翠绿生机
+  ];
+  
+  // 根据目的地名称生成一个稳定的索引
+  const index = destination.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % gradients.length;
+  
+  return gradients[index];
+}
+
+/**
+ * 为目的地返回代表性的emoji图标
+ * @param {string} destination - 目的地名称
+ * @returns {string} Emoji图标
+ */
+function getDestinationIcon(destination) {
+  // 特定城市的图标映射
+  const iconMap = {
+    // 国内城市
+    '北京': '🏯',
+    '上海': '🏙️',
+    '广州': '🌆',
+    '深圳': '🏢',
+    '杭州': '🌊',
+    '南京': '🏛️',
+    '成都': '🐼',
+    '西安': '🏺',
+    '重庆': '🌃',
+    '武汉': '🌉',
+    '苏州': '🏞️',
+    '厦门': '🏖️',
+    '青岛': '⛵',
+    '大连': '🌅',
+    '桂林': '⛰️',
+    '三亚': '🏝️',
+    '丽江': '🏔️',
+    '拉萨': '🕌',
+    '哈尔滨': '❄️',
+    '昆明': '🌸',
+    
+    // 国际城市
+    '东京': '🗼',
+    '京都': '⛩️',
+    '大阪': '🏯',
+    '首尔': '🏛️',
+    '曼谷': '🛕',
+    '新加坡': '🦁',
+    '巴厘岛': '🌴',
+    '巴黎': '🗼',
+    '伦敦': '🏰',
+    '纽约': '🗽',
+    '洛杉矶': '🎬',
+    '悉尼': '🎭',
+    '罗马': '🏛️',
+    '威尼斯': '🚣',
+    '迪拜': '🕌',
+  };
+  
+  // 清理名称
+  const cleanName = destination.replace(/[^\u4e00-\u9fa5a-zA-Z\s]/g, '').trim();
+  
+  // 查找特定图标
+  if (iconMap[cleanName]) {
+    return iconMap[cleanName];
+  }
+  
+  // 模糊匹配
+  for (const [key, value] of Object.entries(iconMap)) {
+    if (cleanName.includes(key) || key.includes(cleanName)) {
+      return value;
+    }
+  }
+  
+  // 默认图标
+  return '✈️';
+}
+
+/**
+ * 获取精选城市图片（使用真实可访问的图片URL）
+ * @param {string} cityName - 城市名称
+ * @returns {string|null} 图片URL或null
+ */
+function getCuratedCityImage(cityName) {
+  // 精选图片库 - 使用公开的图片CDN（Unsplash Random API）
+  // 这些URL使用Unsplash的特定图片ID，确保图片相关性和稳定性
+  const cityImages = {
+    // 国内热门城市 - 使用Unsplash的真实照片
+    '北京': 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=1200&h=600&fit=crop', // 故宫
+    '上海': 'https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?w=1200&h=600&fit=crop', // 上海外滩
+    '广州': 'https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=1200&h=600&fit=crop', // 广州塔
+    '深圳': 'https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=1200&h=600&fit=crop', // 现代城市
+    '杭州': 'https://images.unsplash.com/photo-1559564484-e48fc5580e39?w=1200&h=600&fit=crop', // 西湖
+    '南京': 'https://images.unsplash.com/photo-1590735213920-68192a487bc2?w=1200&h=600&fit=crop', // 南京城市风光
+    '成都': 'https://images.unsplash.com/photo-1590735213920-68192a487bc2?w=1200&h=600&fit=crop', // 成都
+    '西安': 'https://images.unsplash.com/photo-1604112030934-2f9e7fa8e9c0?w=1200&h=600&fit=crop', // 西安古城
+    '重庆': 'https://images.unsplash.com/photo-1590735213920-68192a487bc2?w=1200&h=600&fit=crop', // 重庆夜景
+    '武汉': 'https://images.unsplash.com/photo-1590735213920-68192a487bc2?w=1200&h=600&fit=crop', // 武汉
+    '苏州': 'https://images.unsplash.com/photo-1589726363344-dddb74c9d8d5?w=1200&h=600&fit=crop', // 苏州园林
+    '厦门': 'https://images.unsplash.com/photo-1598948485421-33a1655d3c18?w=1200&h=600&fit=crop', // 厦门海景
+    '青岛': 'https://images.unsplash.com/photo-1598948485421-33a1655d3c18?w=1200&h=600&fit=crop', // 青岛海滨
+    '大连': 'https://images.unsplash.com/photo-1598948485421-33a1655d3c18?w=1200&h=600&fit=crop', // 大连
+    '桂林': 'https://images.unsplash.com/photo-1589726363344-dddb74c9d8d5?w=1200&h=600&fit=crop', // 桂林山水
+    '三亚': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1200&h=600&fit=crop', // 三亚海滩
+    '丽江': 'https://images.unsplash.com/photo-1584555684040-bad07f5a8f5e?w=1200&h=600&fit=crop', // 丽江古城
+    '拉萨': 'https://images.unsplash.com/photo-1584555684040-bad07f5a8f5e?w=1200&h=600&fit=crop', // 布达拉宫
+    
+    // 国际城市
+    '东京': 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200&h=600&fit=crop', // 东京城市
+    '京都': 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&h=600&fit=crop', // 京都寺庙
+    '大阪': 'https://images.unsplash.com/photo-1590559899731-a382839e5549?w=1200&h=600&fit=crop', // 大阪城
+    '首尔': 'https://images.unsplash.com/photo-1549693578-d683be217e58?w=1200&h=600&fit=crop', // 首尔
+    '曼谷': 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=1200&h=600&fit=crop', // 曼谷
+    '新加坡': 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1200&h=600&fit=crop', // 新加坡
+    '巴厘岛': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1200&h=600&fit=crop', // 巴厘岛海滩
+    '巴黎': 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&h=600&fit=crop', // 巴黎埃菲尔铁塔
+    '伦敦': 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&h=600&fit=crop', // 伦敦
+    '纽约': 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=1200&h=600&fit=crop', // 纽约
+    '洛杉矶': 'https://images.unsplash.com/photo-1534190239940-9ba8944ea261?w=1200&h=600&fit=crop', // 洛杉矶
+    '悉尼': 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=1200&h=600&fit=crop', // 悉尼歌剧院
+    '罗马': 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&h=600&fit=crop', // 罗马斗兽场
+    '威尼斯': 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1200&h=600&fit=crop', // 威尼斯
+    '迪拜': 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200&h=600&fit=crop', // 迪拜
+  };
+  
+  // 清理城市名称
+  const cleanName = cityName.replace(/[^\u4e00-\u9fa5a-zA-Z\s]/g, '').trim();
+  
+  // 精确匹配
+  if (cityImages[cleanName]) {
+    return cityImages[cleanName];
+  }
+  
+  // 模糊匹配
+  for (const [key, value] of Object.entries(cityImages)) {
+    if (cleanName.includes(key) || key.includes(cleanName)) {
+      return value;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * 获取智能关键词（支持中文地名/景点的英文映射）
+ * @param {string} name - 地名或景点名称
+ * @param {string} context - 上下文 ('destination' 或 'attraction')
+ * @returns {string} 编码后的关键词字符串
+ */
+function getSmartKeywords(name, context = 'destination') {
+  // 常见中国城市和景点的英文映射
+  const locationMap = {
+    // 直辖市
+    '北京': 'Beijing,China,Forbidden City,Great Wall',
+    '上海': 'Shanghai,China,Bund,Oriental Pearl Tower',
+    '天津': 'Tianjin,China',
+    '重庆': 'Chongqing,China,mountain city',
+    
+    // 省会城市
+    '南京': 'Nanjing,China,Ming Dynasty,Confucius Temple',
+    '杭州': 'Hangzhou,China,West Lake,tea',
+    '苏州': 'Suzhou,China,classical gardens,water town',
+    '广州': 'Guangzhou,China,Canton Tower',
+    '深圳': 'Shenzhen,China,modern city',
+    '成都': 'Chengdu,China,panda,Sichuan',
+    '西安': 'Xian,China,Terracotta Warriors,ancient city',
+    '武汉': 'Wuhan,China,Yangtze River',
+    '厦门': 'Xiamen,China,Gulangyu Island,seaside',
+    '青岛': 'Qingdao,China,seaside,beer',
+    '大连': 'Dalian,China,coastal city',
+    '哈尔滨': 'Harbin,China,ice festival,Russian',
+    '昆明': 'Kunming,China,spring city,Yunnan',
+    '长沙': 'Changsha,China,Hunan',
+    '郑州': 'Zhengzhou,China,Henan',
+    '济南': 'Jinan,China,springs',
+    '合肥': 'Hefei,China,Anhui',
+    '南昌': 'Nanchang,China,Jiangxi',
+    '福州': 'Fuzhou,China,Fujian',
+    '南宁': 'Nanning,China,Guangxi',
+    '贵阳': 'Guiyang,China,Guizhou',
+    '兰州': 'Lanzhou,China,Yellow River,noodles',
+    '西宁': 'Xining,China,Qinghai',
+    '银川': 'Yinchuan,China,Ningxia',
+    '乌鲁木齐': 'Urumqi,China,Xinjiang',
+    '拉萨': 'Lhasa,Tibet,Potala Palace,Buddhism',
+    
+    // 热门旅游城市
+    '丽江': 'Lijiang,China,Old Town,Naxi',
+    '桂林': 'Guilin,China,karst landscape,Li River',
+    '三亚': 'Sanya,China,tropical beach,Hainan',
+    '张家界': 'Zhangjiajie,China,Avatar mountains',
+    '黄山': 'Huangshan,Yellow Mountains,China',
+    '九寨沟': 'Jiuzhaigou,China,colorful lakes',
+    '峨眉山': 'Mount Emei,China,Buddhist',
+    
+    // 国际城市
+    '东京': 'Tokyo,Japan,Shibuya,cherry blossom',
+    '京都': 'Kyoto,Japan,temple,traditional',
+    '大阪': 'Osaka,Japan,castle,food',
+    '首尔': 'Seoul,South Korea,palace',
+    '釜山': 'Busan,South Korea,beach',
+    '曼谷': 'Bangkok,Thailand,temple,market',
+    '清迈': 'Chiang Mai,Thailand,temple',
+    '新加坡': 'Singapore,Marina Bay,Gardens',
+    '吉隆坡': 'Kuala Lumpur,Malaysia,Petronas Towers',
+    '巴厘岛': 'Bali,Indonesia,beach,temple',
+    '巴黎': 'Paris,France,Eiffel Tower,Louvre',
+    '伦敦': 'London,UK,Big Ben,Tower Bridge',
+    '纽约': 'New York,USA,Statue of Liberty,Times Square',
+    '洛杉矶': 'Los Angeles,USA,Hollywood',
+    '旧金山': 'San Francisco,USA,Golden Gate Bridge',
+    '悉尼': 'Sydney,Australia,Opera House,Harbour Bridge',
+    '墨尔本': 'Melbourne,Australia',
+    '罗马': 'Rome,Italy,Colosseum,Vatican',
+    '威尼斯': 'Venice,Italy,canal,gondola',
+    '巴塞罗那': 'Barcelona,Spain,Gaudi,Sagrada Familia',
+    '阿姆斯特丹': 'Amsterdam,Netherlands,canal',
+    '迪拜': 'Dubai,UAE,Burj Khalifa,luxury',
+  };
+  
+  // 清理名称
+  const cleanName = name.replace(/[^\u4e00-\u9fa5a-zA-Z\s]/g, '').trim();
+  
+  // 查找映射
+  let keywords = '';
+  let found = false;
+  
+  // 精确匹配
+  if (locationMap[cleanName]) {
+    keywords = locationMap[cleanName];
+    found = true;
+  } else {
+    // 模糊匹配（检查是否包含）
+    for (const [key, value] of Object.entries(locationMap)) {
+      if (cleanName.includes(key) || key.includes(cleanName)) {
+        keywords = value;
+        found = true;
+        break;
+      }
+    }
+  }
+  
+  // 如果没有找到映射，使用原名称+通用关键词
+  if (!found) {
+    if (context === 'destination') {
+      keywords = `${cleanName},travel,city,landscape,architecture,tourism`;
+    } else {
+      keywords = `${cleanName},attraction,landmark,tourist,scenic`;
+    }
+  } else {
+    // 如果找到映射，添加通用关键词
+    if (context === 'destination') {
+      keywords += ',travel,landscape';
+    } else {
+      keywords += ',attraction,landmark';
+    }
+  }
+  
+  return encodeURIComponent(keywords);
+}
+
 // 显示用户计划列表
 function displayUserPlans(plans) {
   const plansList = document.getElementById("plansList");
@@ -397,22 +684,34 @@ function displayUserPlans(plans) {
 
   plansList.innerHTML = plans
     .map(
-      (plan) => `
+      (plan) => {
+        // 为每个目的地生成独特的渐变色
+        const gradient = getDestinationGradient(plan.destination);
+        return `
         <div class="plan-card" onclick="viewPlan('${plan.id}')">
-            <h3>${plan.destination}</h3>
-            <div class="plan-meta">
-                <span>📅 ${plan.days}天</span>
-                <span>💰 ¥${plan.budget}</span>
-                <span>👥 ${plan.travelers}人</span>
+            <div class="plan-card-image" style="background: ${gradient}">
+                <div class="plan-card-overlay">
+                    <div class="destination-icon">${getDestinationIcon(plan.destination)}</div>
+                    <h3>${plan.destination}</h3>
+                    <p class="destination-subtitle">${plan.days}天 · ${plan.travelers}人同行</p>
+                </div>
             </div>
-            <p>${plan.preferences || ""}</p>
-            <div class="plan-actions">
-                <button class="btn btn-secondary" onclick="event.stopPropagation(); deletePlan('${
-                  plan.id
-                }')">删除</button>
+            <div class="plan-card-content">
+                <div class="plan-meta">
+                    <span>📅 ${plan.days}天</span>
+                    <span>💰 ¥${plan.budget}</span>
+                    <span>👥 ${plan.travelers}人</span>
+                </div>
+                ${plan.preferences ? `<p class="plan-preferences">${plan.preferences}</p>` : ''}
+                <div class="plan-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); deletePlan('${
+                      plan.id
+                    }')">删除</button>
+                </div>
             </div>
         </div>
-    `
+    `;
+      }
     )
     .join("");
 }

@@ -155,21 +155,104 @@ function showLocationsOnMainMap(locations, title = "旅行地图") {
           ? "住宿"
           : "地点";
 
+      // 生成渐变背景（不使用外部图片）
+      const gradient = getLocationGradient(location.name, location.type);
+      
+      // 根据类型提供推荐理由
+      const recommendation = generateRecommendation(location);
+      
+      // 生成扩展的详细信息
+      const detailedInfo = generateDetailedInfo(location);
+      
+      // 营业时间（如果没有则提供默认）
+      const businessHours = location.business_hours || detailedInfo.businessHours;
+      
       const infoWindow = new AMap.InfoWindow({
         content: `
-                    <div style="padding: 12px; min-width: 200px;">
-                        <h4 style="margin: 0 0 8px 0; color: #2563eb;">${icon} ${
-          location.name
-        }</h4>
-                        <p style="margin: 4px 0; color: #64748b; font-size: 0.9em;"><strong>类型：</strong>${typeLabel}</p>
-                        <p style="margin: 4px 0; color: #1e293b;">${
-                          location.description || "暂无描述"
-                        }</p>
-                        <p style="margin: 8px 0 0 0; color: #10b981; font-weight: bold;">💰 预估费用：¥${
-                          location.estimated_cost || 0
-                        }</p>
+                    <div class="map-info-window">
+                        <div class="map-info-image" style="background: ${gradient}">
+                            <div class="map-info-image-content">
+                                <div class="map-info-image-icon">${icon}</div>
+                                <div class="map-info-image-label">${typeLabel}</div>
+                            </div>
+                        </div>
+                        <div class="map-info-content">
+                            <h4 class="map-info-title">${location.name}</h4>
+                            <div class="map-info-tags">
+                                <span class="map-info-tag tag-${location.type}">${typeLabel}</span>
+                                ${location.rating ? `<span class="map-info-tag tag-rating">⭐ ${location.rating}/5</span>` : ''}
+                            </div>
+                            
+                            <!-- 详细描述 -->
+                            <div class="map-info-description">
+                                <p class="map-info-desc">${location.description || detailedInfo.description}</p>
+                            </div>
+                            
+                            <!-- 推荐理由 -->
+                            ${recommendation ? `<div class="map-info-recommendation">💡 <strong>推荐理由：</strong>${recommendation}</div>` : ''}
+                            
+                            <!-- 特色亮点 -->
+                            ${detailedInfo.highlights ? `
+                            <div class="map-info-highlights">
+                                <div class="highlights-title">✨ 特色亮点</div>
+                                <ul class="highlights-list">
+                                    ${detailedInfo.highlights.map(h => `<li>${h}</li>`).join('')}
+                                </ul>
+                            </div>
+                            ` : ''}
+                            
+                            <!-- 实用信息 -->
+                            <div class="map-info-details">
+                                <div class="map-info-detail-item">
+                                    <span class="detail-icon">🕒</span>
+                                    <div class="detail-content">
+                                        <div class="detail-label">营业时间</div>
+                                        <div class="detail-text">${businessHours}</div>
+                                    </div>
+                                </div>
+                                
+                                ${detailedInfo.duration ? `
+                                <div class="map-info-detail-item">
+                                    <span class="detail-icon">⏱️</span>
+                                    <div class="detail-content">
+                                        <div class="detail-label">建议游玩时长</div>
+                                        <div class="detail-text">${detailedInfo.duration}</div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                
+                                ${location.estimated_cost ? `
+                                <div class="map-info-detail-item">
+                                    <span class="detail-icon">💰</span>
+                                    <div class="detail-content">
+                                        <div class="detail-label">预估费用</div>
+                                        <div class="detail-text highlight-cost">¥${location.estimated_cost}</div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                
+                                ${detailedInfo.bestTime ? `
+                                <div class="map-info-detail-item">
+                                    <span class="detail-icon">🌤️</span>
+                                    <div class="detail-content">
+                                        <div class="detail-label">最佳时间</div>
+                                        <div class="detail-text">${detailedInfo.bestTime}</div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                            
+                            <!-- 温馨提示 -->
+                            ${detailedInfo.tips ? `
+                            <div class="map-info-tips">
+                                <div class="tips-icon">💡</div>
+                                <div class="tips-text">${detailedInfo.tips}</div>
+                            </div>
+                            ` : ''}
+                        </div>
                     </div>
                 `,
+        offset: new AMap.Pixel(0, -30),
       });
 
       marker.on("click", () => {
@@ -1091,4 +1174,421 @@ async function planRoute(origin, destination, mode = "WALKING") {
         });
     }
   });
+}
+
+// ==========================================
+// 辅助函数：生成地点相关图片
+// ==========================================
+
+/**
+ * 为地点生成渐变背景
+ * @param {string} name - 地点名称
+ * @param {string} type - 地点类型
+ * @returns {string} CSS渐变背景
+ */
+function getLocationGradient(name, type) {
+  // 根据类型选择渐变色系
+  const typeGradients = {
+    activity: [
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+      'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
+    ],
+    restaurant: [
+      'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+      'linear-gradient(135deg, #f77062 0%, #fe5196 100%)',
+      'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)',
+      'linear-gradient(135deg, #e94057 0%, #f27121 100%)',
+    ],
+    hotel: [
+      'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+      'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+      'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+      'linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%)',
+      'linear-gradient(135deg, #0ba360 0%, #3cba92 100%)',
+    ],
+  };
+  
+  const gradients = typeGradients[type] || typeGradients.activity;
+  const index = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % gradients.length;
+  
+  return gradients[index];
+}
+
+/**
+ * 根据地点名称和类型生成相关图片URL（真实图片）
+ * @param {string} locationName - 地点名称
+ * @param {string} type - 地点类型 (activity/restaurant/hotel)
+ * @returns {string} 图片URL
+ */
+function generateLocationImage(locationName, type) {
+  // 优先使用精选景点图片
+  const curatedImage = getCuratedAttractionImage(locationName);
+  if (curatedImage) {
+    return curatedImage;
+  }
+  
+  // 备选：根据类型返回通用图片
+  return getGenericImageByType(locationName, type);
+}
+
+/**
+ * 获取精选景点图片（使用真实Unsplash照片）
+ * @param {string} name - 景点名称
+ * @returns {string|null} 图片URL或null
+ */
+function getCuratedAttractionImage(name) {
+  // 精选景点图片库 - 使用Unsplash的真实照片ID
+  const attractionImages = {
+    // 北京景点
+    '故宫': 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=800&h=500&fit=crop',
+    '长城': 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=800&h=500&fit=crop',
+    '八达岭长城': 'https://images.unsplash.com/photo-1580655653885-65763b2597d0?w=800&h=500&fit=crop',
+    '天安门': 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=800&h=500&fit=crop',
+    '颐和园': 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=800&h=500&fit=crop',
+    '天坛': 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=800&h=500&fit=crop',
+    '鸟巢': 'https://images.unsplash.com/photo-1580655653885-65763b2597d0?w=800&h=500&fit=crop',
+    
+    // 上海景点
+    '外滩': 'https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?w=800&h=500&fit=crop',
+    '东方明珠': 'https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?w=800&h=500&fit=crop',
+    '南京路': 'https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?w=800&h=500&fit=crop',
+    '豫园': 'https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?w=800&h=500&fit=crop',
+    '上海中心': 'https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?w=800&h=500&fit=crop',
+    
+    // 南京景点
+    '中山陵': 'https://images.unsplash.com/photo-1590735213920-68192a487bc2?w=800&h=500&fit=crop',
+    '夫子庙': 'https://images.unsplash.com/photo-1590735213920-68192a487bc2?w=800&h=500&fit=crop',
+    '玄武湖': 'https://images.unsplash.com/photo-1590735213920-68192a487bc2?w=800&h=500&fit=crop',
+    '南京奥体中心': 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&h=500&fit=crop',
+    '南京博物院': 'https://images.unsplash.com/photo-1566127444979-b3d2b654e3a0?w=800&h=500&fit=crop',
+    '总统府': 'https://images.unsplash.com/photo-1590735213920-68192a487bc2?w=800&h=500&fit=crop',
+    '鸡鸣寺': 'https://images.unsplash.com/photo-1548013146-72479768bada?w=800&h=500&fit=crop',
+    '秦淮河': 'https://images.unsplash.com/photo-1590735213920-68192a487bc2?w=800&h=500&fit=crop',
+    
+    // 杭州景点
+    '西湖': 'https://images.unsplash.com/photo-1559564484-e48fc5580e39?w=800&h=500&fit=crop',
+    '雷峰塔': 'https://images.unsplash.com/photo-1559564484-e48fc5580e39?w=800&h=500&fit=crop',
+    '灵隐寺': 'https://images.unsplash.com/photo-1548013146-72479768bada?w=800&h=500&fit=crop',
+    
+    // 西安景点
+    '兵马俑': 'https://images.unsplash.com/photo-1604112030934-2f9e7fa8e9c0?w=800&h=500&fit=crop',
+    '大雁塔': 'https://images.unsplash.com/photo-1548013146-72479768bada?w=800&h=500&fit=crop',
+    '钟楼': 'https://images.unsplash.com/photo-1604112030934-2f9e7fa8e9c0?w=800&h=500&fit=crop',
+    '西安城墙': 'https://images.unsplash.com/photo-1604112030934-2f9e7fa8e9c0?w=800&h=500&fit=crop',
+    
+    // 国际景点
+    '东京塔': 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=800&h=500&fit=crop',
+    '浅草寺': 'https://images.unsplash.com/photo-1548013146-72479768bada?w=800&h=500&fit=crop',
+    '清水寺': 'https://images.unsplash.com/photo-1548013146-72479768bada?w=800&h=500&fit=crop',
+    '金阁寺': 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=500&fit=crop',
+    '富士山': 'https://images.unsplash.com/photo-1576675784201-7c738f7c5f8e?w=800&h=500&fit=crop',
+    '埃菲尔铁塔': 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800&h=500&fit=crop',
+    '自由女神像': 'https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=800&h=500&fit=crop',
+    '大本钟': 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&h=500&fit=crop',
+  };
+  
+  // 清理名称
+  const cleanName = name.replace(/[^\u4e00-\u9fa5a-zA-Z\s]/g, '').trim();
+  
+  // 精确匹配
+  if (attractionImages[cleanName]) {
+    return attractionImages[cleanName];
+  }
+  
+  // 模糊匹配
+  for (const [key, value] of Object.entries(attractionImages)) {
+    if (cleanName.includes(key) || key.includes(cleanName)) {
+      return value;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * 根据类型获取通用图片
+ * @param {string} name - 地点名称
+ * @param {string} type - 地点类型
+ * @returns {string} 图片URL
+ */
+function getGenericImageByType(name, type) {
+  // 通用图片（按类型分类）
+  const genericImages = {
+    activity: [
+      'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&h=500&fit=crop', // 旅游景点
+      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&h=500&fit=crop', // 自然风光
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=500&fit=crop', // 山景
+      'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=500&fit=crop', // 湖景
+      'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=500&fit=crop', // 建筑
+    ],
+    restaurant: [
+      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=500&fit=crop', // 餐厅内景
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&h=500&fit=crop', // 美食
+      'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=500&fit=crop', // 餐厅氛围
+      'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=800&h=500&fit=crop', // 中餐
+      'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&h=500&fit=crop', // 餐桌
+    ],
+    hotel: [
+      'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=500&fit=crop', // 酒店外观
+      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&h=500&fit=crop', // 酒店房间
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=500&fit=crop', // 酒店大堂
+      'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&h=500&fit=crop', // 豪华酒店
+      'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=800&h=500&fit=crop', // 酒店设施
+    ]
+  };
+  
+  // 根据名称生成一个固定的索引（确保同一地点总是显示相同图片）
+  const images = genericImages[type] || genericImages.activity;
+  const index = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % images.length;
+  
+  return images[index];
+}
+
+/**
+ * 获取地点的智能关键词（支持景点名称的英文映射）
+ * @param {string} name - 地点名称
+ * @param {string} type - 地点类型
+ * @returns {string} 编码后的关键词字符串
+ */
+function getLocationSmartKeywords(name, type) {
+  // 常见景点和地标的英文映射
+  const attractionMap = {
+    // 北京
+    '故宫': 'Forbidden City,Beijing,palace,imperial',
+    '天安门': 'Tiananmen Square,Beijing,China',
+    '长城': 'Great Wall,China,ancient,defense',
+    '八达岭长城': 'Badaling Great Wall,China',
+    '颐和园': 'Summer Palace,Beijing,garden,lake',
+    '天坛': 'Temple of Heaven,Beijing,circular',
+    '鸟巢': 'Birds Nest,Beijing,Olympic,stadium',
+    '水立方': 'Water Cube,Beijing,Olympic,swimming',
+    
+    // 上海
+    '外滩': 'The Bund,Shanghai,skyline,waterfront',
+    '东方明珠': 'Oriental Pearl Tower,Shanghai,tower',
+    '南京路': 'Nanjing Road,Shanghai,shopping,street',
+    '豫园': 'Yuyuan Garden,Shanghai,classical,garden',
+    '上海中心': 'Shanghai Tower,skyscraper,modern',
+    
+    // 南京
+    '中山陵': 'Sun Yat-sen Mausoleum,Nanjing,memorial',
+    '夫子庙': 'Confucius Temple,Nanjing,traditional,market',
+    '玄武湖': 'Xuanwu Lake,Nanjing,park,lake',
+    '明城墙': 'Ming City Wall,Nanjing,ancient,wall',
+    '南京大屠杀纪念馆': 'Nanjing Massacre Memorial,museum,historical',
+    '总统府': 'Presidential Palace,Nanjing,historical,building',
+    '鸡鸣寺': 'Jiming Temple,Nanjing,Buddhist,temple',
+    '秦淮河': 'Qinhuai River,Nanjing,boat,night',
+    '南京奥体中心': 'Nanjing Olympic Sports Center,stadium,modern',
+    '南京博物院': 'Nanjing Museum,cultural,artifacts',
+    
+    // 杭州
+    '西湖': 'West Lake,Hangzhou,scenic,boat',
+    '雷峰塔': 'Leifeng Pagoda,Hangzhou,tower,West Lake',
+    '灵隐寺': 'Lingyin Temple,Hangzhou,Buddhist,ancient',
+    '千岛湖': 'Thousand Island Lake,Hangzhou,islands,water',
+    
+    // 西安
+    '兵马俑': 'Terracotta Warriors,Xian,ancient,army',
+    '大雁塔': 'Big Wild Goose Pagoda,Xian,Buddhist,tower',
+    '钟楼': 'Bell Tower,Xian,ancient,landmark',
+    '鼓楼': 'Drum Tower,Xian,traditional,tower',
+    '城墙': 'City Wall,Xian,ancient,fortification',
+    
+    // 成都
+    '大熊猫基地': 'Panda Base,Chengdu,panda,cute',
+    '宽窄巷子': 'Kuanzhai Alley,Chengdu,traditional,street',
+    '武侯祠': 'Wuhou Temple,Chengdu,Three Kingdoms',
+    '都江堰': 'Dujiangyan,Chengdu,ancient,irrigation',
+    
+    // 其他著名景点
+    '布达拉宫': 'Potala Palace,Lhasa,Tibet,Buddhist',
+    '泰山': 'Mount Tai,Shandong,sacred,mountain',
+    '黄山': 'Huangshan,Yellow Mountains,pine,clouds',
+    '张家界': 'Zhangjiajie,Avatar,mountain,karst',
+    '九寨沟': 'Jiuzhaigou,colorful,lake,waterfall',
+    '桂林山水': 'Guilin landscape,karst,Li River',
+    '漓江': 'Li River,Guilin,karst,boat',
+    '西双版纳': 'Xishuangbanna,tropical,rainforest,Yunnan',
+    '长江三峡': 'Three Gorges,Yangtze River,canyon',
+    
+    // 国际景点
+    '埃菲尔铁塔': 'Eiffel Tower,Paris,landmark,iron',
+    '自由女神像': 'Statue of Liberty,New York,iconic',
+    '大本钟': 'Big Ben,London,tower,clock',
+    '凯旋门': 'Arc de Triomphe,Paris,monument',
+    '圣彼得大教堂': 'St Peters Basilica,Vatican,church',
+    '比萨斜塔': 'Leaning Tower of Pisa,Italy',
+    '富士山': 'Mount Fuji,Japan,volcano,sacred',
+    '清水寺': 'Kiyomizu Temple,Kyoto,wooden,temple',
+    '金阁寺': 'Kinkaku-ji,Kyoto,golden,temple',
+    '浅草寺': 'Sensoji Temple,Tokyo,traditional,temple',
+    '东京塔': 'Tokyo Tower,Japan,red,landmark',
+    '晴空塔': 'Tokyo Skytree,Japan,tall,tower',
+  };
+  
+  // 清理名称
+  const cleanName = name.replace(/[^\u4e00-\u9fa5a-zA-Z\s]/g, '').trim();
+  
+  let keywords = '';
+  let found = false;
+  
+  // 查找景点映射（精确匹配或模糊匹配）
+  if (attractionMap[cleanName]) {
+    keywords = attractionMap[cleanName];
+    found = true;
+  } else {
+    // 模糊匹配（检查名称中是否包含已知景点）
+    for (const [key, value] of Object.entries(attractionMap)) {
+      if (cleanName.includes(key) || key.includes(cleanName)) {
+        keywords = value;
+        found = true;
+        break;
+      }
+    }
+  }
+  
+  // 根据类型添加关键词
+  if (!found) {
+    switch (type) {
+      case 'restaurant':
+        keywords = `${cleanName},restaurant,food,cuisine,dining,delicious`;
+        break;
+      case 'hotel':
+        keywords = `${cleanName},hotel,accommodation,room,luxury,building`;
+        break;
+      case 'activity':
+      default:
+        keywords = `${cleanName},attraction,landmark,tourist,scenic,beautiful`;
+        break;
+    }
+  } else {
+    // 如果找到了景点映射，根据类型添加额外关键词
+    switch (type) {
+      case 'restaurant':
+        keywords += ',food,dining';
+        break;
+      case 'hotel':
+        keywords += ',hotel,accommodation';
+        break;
+      case 'activity':
+      default:
+        keywords += ',scenic,beautiful';
+        break;
+    }
+  }
+  
+  return encodeURIComponent(keywords);
+}
+
+/**
+ * 根据地点信息生成推荐理由
+ * @param {object} location - 地点对象
+ * @returns {string} 推荐理由
+ */
+function generateRecommendation(location) {
+  // 如果AI已经提供了推荐理由，直接使用
+  if (location.recommendation) {
+    return location.recommendation;
+  }
+  
+  // 否则根据类型和描述生成简单的推荐语
+  const recommendations = {
+    activity: [
+      '必游景点，不容错过',
+      '热门打卡地，值得一游',
+      '独特体验，深度游览',
+      '文化地标，感受当地特色',
+    ],
+    restaurant: [
+      '地道美食，口碑推荐',
+      '特色风味，不可错过',
+      '当地名店，值得品尝',
+      '人气餐厅，提前预订',
+    ],
+    hotel: [
+      '舒适住宿，交通便利',
+      '性价比高，设施齐全',
+      '环境优雅，服务周到',
+      '地理位置佳，出行方便',
+    ],
+  };
+  
+  const typeRecommendations = recommendations[location.type] || recommendations.activity;
+  const randomIndex = Math.floor(Math.random() * typeRecommendations.length);
+  
+  return typeRecommendations[randomIndex];
+}
+
+/**
+ * 生成地点的详细扩展信息
+ * @param {object} location - 地点对象
+ * @returns {object} 详细信息对象
+ */
+function generateDetailedInfo(location) {
+  const info = {
+    description: location.description || '欢迎前来探索这个精彩的地点',
+    businessHours: '09:00-18:00',
+    duration: null,
+    bestTime: null,
+    highlights: null,
+    tips: null
+  };
+  
+  // 根据类型定制详细信息
+  switch (location.type) {
+    case 'activity':
+      info.businessHours = location.business_hours || '08:00-18:00';
+      info.duration = '2-3小时';
+      info.bestTime = '上午或傍晚';
+      info.highlights = [
+        '适合拍照打卡',
+        '了解当地文化',
+        '体验独特氛围'
+      ];
+      info.tips = '建议提前查询是否需要预约，携带相机记录美好瞬间';
+      break;
+      
+    case 'restaurant':
+      info.businessHours = location.business_hours || '11:00-14:00, 17:00-21:00';
+      info.duration = '1-1.5小时';
+      info.bestTime = '避开用餐高峰';
+      info.highlights = [
+        '品尝地道美食',
+        '特色菜品推荐',
+        '环境舒适宜人'
+      ];
+      info.tips = '建议提前预订，高峰时段可能需要等位';
+      break;
+      
+    case 'hotel':
+      info.businessHours = '24小时营业';
+      info.duration = '过夜住宿';
+      info.bestTime = '14:00后入住';
+      info.highlights = [
+        '设施完善齐全',
+        '交通便利',
+        '服务优质周到'
+      ];
+      info.tips = '入住时请携带有效身份证件，退房时间通常为12:00';
+      break;
+      
+    default:
+      info.duration = '1-2小时';
+      info.bestTime = '随时可访问';
+      info.highlights = ['值得一游', '体验丰富', '印象深刻'];
+      info.tips = '请注意开放时间，合理安排行程';
+  }
+  
+  // 如果location中有更具体的信息，优先使用
+  if (location.duration) info.duration = location.duration;
+  if (location.best_time) info.bestTime = location.best_time;
+  if (location.highlights && location.highlights.length > 0) info.highlights = location.highlights;
+  if (location.tips) info.tips = location.tips;
+  
+  return info;
 }

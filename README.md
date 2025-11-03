@@ -182,34 +182,106 @@ docker run -d \
 
 ## 📸 功能展示
 
-### 主界面
-现代化的主界面，支持语音和手动输入，右侧实时显示地图
+### 🎯 主界面与核心功能
 
-### 智能规划
 <table>
   <tr>
-    <td width="50%">
-      <strong>语音识别</strong><br/>
-      自然语言语音输入，AI 自动识别并填充表单
+    <td width="50%" align="center">
+      <img src="界面功能截图/基本功能主界面.jpg" alt="基本功能主界面" width="100%"/>
+      <br/><strong>🏠 主界面</strong><br/>
+      现代化UI设计，支持语音和手动输入，右侧实时显示地图
     </td>
-    <td width="50%">
-      <strong>详细行程</strong><br/>
-      完整的每日行程安排，包含景点、餐厅、住宿
+    <td width="50%" align="center">
+      <img src="界面功能截图/语音识别1.png" alt="语音识别功能" width="100%"/>
+      <br/><strong>🎤 语音识别</strong><br/>
+      自然语言语音输入，AI自动识别并填充表单
     </td>
   </tr>
   <tr>
-    <td>
-      <strong>地图导航</strong><br/>
-      支持国内外地点标记和路线规划
+    <td align="center">
+      <img src="界面功能截图/语音识别2.jpg" alt="语音识别结果" width="100%"/>
+      <br/><strong>✅ 语音识别结果</strong><br/>
+      实时转写并智能解析用户意图
     </td>
-    <td>
-      <strong>预算管理</strong><br/>
-      实时追踪花费，AI 智能分析建议
+    <td align="center">
+      <img src="界面功能截图/存储计划列表.jpg" alt="计划列表" width="100%"/>
+      <br/><strong>📋 计划列表</strong><br/>
+      渐变卡片设计，直观展示所有旅行计划
     </td>
   </tr>
 </table>
 
-> 📸 更多截图请查看 `界面功能截图/` 目录
+### 🗺️ 智能规划与地图导航
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="界面功能截图/详细计划以及路线.jpg" alt="详细计划" width="100%"/>
+      <br/><strong>📅 详细行程</strong><br/>
+      完整的每日行程安排，包含景点、餐厅、住宿
+    </td>
+    <td width="50%" align="center">
+      <img src="界面功能截图/路线详情，可单击具体查看.jpg" alt="路线详情" width="100%"/>
+      <br/><strong>🚗 路线规划</strong><br/>
+      支持驾车、步行、公交等多种路线模式
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="界面功能截图/地图地点点击截图.jpg" alt="地图标记" width="100%"/>
+      <br/><strong>📍 地图标记</strong><br/>
+      支持国内外地点标记，彩色路线可视化
+    </td>
+    <td align="center">
+      <img src="界面功能截图/地图详情1（支持点击交互）.jpg" alt="地图交互" width="100%"/>
+      <br/><strong>💬 交互窗口</strong><br/>
+      点击标记查看详细信息，渐变背景+大图标设计
+    </td>
+  </tr>
+</table>
+
+### 💰 预算管理与费用分析
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="界面功能截图/预算管理（可自主添加）.jpg" alt="预算管理" width="100%"/>
+      <br/><strong>💵 预算管理</strong><br/>
+      实时追踪花费，支持自主添加费用记录
+    </td>
+    <td width="50%" align="center">
+      <img src="界面功能截图/费用明细.jpg" alt="费用明细" width="100%"/>
+      <br/><strong>📊 费用明细</strong><br/>
+      分类展示各项支出，直观的可视化图表
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="界面功能截图/费用分析以及ai建议.jpg" alt="费用分析" width="100%"/>
+      <br/><strong>🤖 AI分析</strong><br/>
+      智能分析消费结构，提供优化建议
+    </td>
+    <td align="center">
+      <img src="界面功能截图/详细费用以及建议.jpg" alt="详细建议" width="100%"/>
+      <br/><strong>💡 详细建议</strong><br/>
+      AI生成的旅行建议和费用预估
+    </td>
+  </tr>
+</table>
+
+### ✨ 特色功能
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="界面功能截图/特色小功能（提升用户体验）.jpg" alt="特色功能" width="80%"/>
+      <br/><strong>🎨 浮动工具栏</strong><br/>
+      导出PDF、复制计划、打印、分享、返回顶部、帮助等实用功能
+    </td>
+  </tr>
+</table>
+
+> 💡 **提示**：所有截图展示的是实际运行效果，包含完整的UI/UX现代化设计
 
 ---
 
