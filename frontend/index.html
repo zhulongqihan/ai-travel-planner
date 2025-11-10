@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI旅行规划师</title>
-    <link rel="stylesheet" href="css/style.css?v=35" />
+    <link rel="stylesheet" href="css/style.css?v=36" />
     <!-- 高德地图API -->
     <!-- 临时禁用安全密钥以测试路线规划 -->
     <!--
@@ -28,7 +28,13 @@
           <a href="#home" class="nav-link active">首页</a>
           <a href="#plans" class="nav-link">我的计划</a>
           <a href="#budget" class="nav-link">预算管理</a>
-          <div class="user-info" id="userInfo">
+          <!-- 未登录时显示 -->
+          <div class="auth-buttons" id="authButtons" style="display: none;">
+            <button class="btn btn-primary" id="loginBtn">登录</button>
+            <button class="btn btn-outline" id="registerBtn">注册</button>
+          </div>
+          <!-- 已登录时显示 -->
+          <div class="user-info" id="userInfo" style="display: none;">
             <span id="userEmail"></span>
             <button class="btn btn-secondary" id="logoutBtn">退出</button>
           </div>
@@ -499,6 +505,97 @@
       </div>
     </div>
 
+    <!-- 登录弹窗 -->
+    <div class="modal" id="loginModal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>🔐 用户登录</h3>
+          <button class="modal-close" id="closeLoginModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="loginForm" class="auth-form">
+            <div class="form-group">
+              <label for="loginEmail">邮箱</label>
+              <input
+                type="email"
+                id="loginEmail"
+                placeholder="请输入邮箱"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">密码</label>
+              <input
+                type="password"
+                id="loginPassword"
+                placeholder="请输入密码"
+                required
+              />
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-block">
+                登录
+              </button>
+            </div>
+            <div class="auth-switch">
+              <p>还没有账号？<a href="#" id="switchToRegister">立即注册</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 注册弹窗 -->
+    <div class="modal" id="registerModal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>📝 用户注册</h3>
+          <button class="modal-close" id="closeRegisterModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="registerForm" class="auth-form">
+            <div class="form-group">
+              <label for="registerEmail">邮箱</label>
+              <input
+                type="email"
+                id="registerEmail"
+                placeholder="请输入邮箱"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="registerPassword">密码</label>
+              <input
+                type="password"
+                id="registerPassword"
+                placeholder="请输入密码（至少6位）"
+                required
+                minlength="6"
+              />
+            </div>
+            <div class="form-group">
+              <label for="registerPasswordConfirm">确认密码</label>
+              <input
+                type="password"
+                id="registerPasswordConfirm"
+                placeholder="请再次输入密码"
+                required
+                minlength="6"
+              />
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-block">
+                注册
+              </button>
+            </div>
+            <div class="auth-switch">
+              <p>已有账号？<a href="#" id="switchToLogin">立即登录</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <!-- 加载中提示 -->
     <div id="loading" class="loading" style="display: none">
       <div class="spinner"></div>
@@ -546,8 +643,8 @@
       })();
     </script>
 
-    <script src="js/app.js?v=32"></script>
-    <script src="js/auth.js?v=14"></script>
+    <script src="js/app.js?v=33"></script>
+    <script src="js/auth.js?v=17"></script>
     <script src="js/voice.js?v=13"></script>
     <script src="js/map.js?v=47"></script>
     <script src="js/budget.js?v=13"></script>

@@ -774,6 +774,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (savedUser) {
     currentUser = JSON.parse(savedUser);
     updateUIForLoggedInUser();
+  } else {
+    // 未登录时显示登录/注册按钮
+    updateUIForLoggedOutUser();
   }
 });
 
@@ -781,10 +784,16 @@ document.addEventListener("DOMContentLoaded", () => {
 function updateUIForLoggedInUser() {
   const userInfo = document.getElementById("userInfo");
   const userEmail = document.getElementById("userEmail");
+  const authButtons = document.getElementById("authButtons");
 
   if (userInfo && userEmail) {
     userInfo.style.display = "flex";
     userEmail.textContent = currentUser.email;
+  }
+  
+  // 隐藏登录/注册按钮
+  if (authButtons) {
+    authButtons.style.display = "none";
   }
 }
 
@@ -792,10 +801,16 @@ function updateUIForLoggedInUser() {
 function updateUIForLoggedOutUser() {
   const userInfo = document.getElementById("userInfo");
   const userEmail = document.getElementById("userEmail");
+  const authButtons = document.getElementById("authButtons");
 
   if (userInfo && userEmail) {
     userInfo.style.display = "none";
     userEmail.textContent = "";
+  }
+  
+  // 显示登录/注册按钮
+  if (authButtons) {
+    authButtons.style.display = "flex";
   }
 
   currentUser = null;
